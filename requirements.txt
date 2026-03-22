@@ -1,0 +1,10 @@
+llama-index
+llama-index-vector-stores-lancedb
+llama-index-embeddings-huggingface
+llama-index-embeddings-ollama
+llama-index-llms-ollama
+pypdf
+lancedb
+streamlit
+pandas
+reportlab
