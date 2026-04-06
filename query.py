@@ -8,7 +8,7 @@ from llama_index.core import (
     PromptTemplate
 )
 from llama_index.vector_stores.lancedb import LanceDBVectorStore
-from llama_index.embeddings.ollama import OllamaEmbedding
+from models import NomicOllamaEmbedding
 from llama_index.llms.ollama import Ollama
 from llama_index.core.query_engine import RetrieverQueryEngine
 from llama_index.core.retrievers import VectorIndexRetriever
@@ -18,7 +18,7 @@ DB_DIR = "./vector_db"
 TABLE_NAME = "pdf_chunks"
 
 # Setup Local Models (Ollama)
-Settings.embed_model = OllamaEmbedding(model_name="nomic-embed-text")
+Settings.embed_model = NomicOllamaEmbedding(model_name="nomic-embed-text")
 Settings.llm = Ollama(model="llama3.2", request_timeout=60.0)
 
 # Custom Prompt for Date Priority & Citations
@@ -31,6 +31,7 @@ QA_PROMPT_TMPL = (
     "Each snippet includes 'version_date' and 'file_name' in its metadata.\n"
     "CRITICAL: If you find conflicting information between documents, "
     "always prioritize the information from the document with the most LATEST date.\n"
+    "If the query asks for a list or table, please provide the answer in a clear Markdown format.\n"
     "Always cite the source 'file_name' and 'version_date' for each part of your answer.\n"
     "Query: {query_str}\n"
     "Answer: "
@@ -41,15 +42,22 @@ def get_query_engine():
     # Connect to LanceDB
     vector_store = LanceDBVectorStore(uri=DB_DIR, table_name=TABLE_NAME)
 
+    # Load storage context for docstore
+    storage_context = StorageContext.from_defaults(
+        vector_store=vector_store,
+        persist_dir=DB_DIR
+    )
+
     # Load index from stored data
     index = VectorStoreIndex.from_vector_store(
-        vector_store=vector_store
+        vector_store=vector_store,
+        storage_context=storage_context
     )
 
     # Configure Retriever
     retriever = VectorIndexRetriever(
         index=index,
-        similarity_top_k=5,
+        similarity_top_k=10,
     )
 
     # Configure Response Synthesizer with custom prompt
