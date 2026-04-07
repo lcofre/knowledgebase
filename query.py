@@ -19,7 +19,7 @@ TABLE_NAME = "pdf_chunks"
 
 # Setup Local Models (Ollama)
 Settings.embed_model = NomicOllamaEmbedding(model_name="nomic-embed-text")
-Settings.llm = Ollama(model="llama3.2", request_timeout=60.0)
+Settings.llm = Ollama(model="llama3.2", request_timeout=120.0)
 
 # Custom Prompt for Date Priority & Citations
 QA_PROMPT_TMPL = (

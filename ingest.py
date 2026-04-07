@@ -21,7 +21,7 @@ TABLE_NAME = "pdf_chunks"
 # Setup Local Embedding & LLM (Ollama)
 # Using nomic-embed-text for high performance local embeddings
 Settings.embed_model = NomicOllamaEmbedding(model_name="nomic-embed-text")
-Settings.llm = Ollama(model="llama3.2", request_timeout=60.0)
+Settings.llm = Ollama(model="llama3.2", request_timeout=120.0)
 Settings.node_parser = SentenceSplitter(chunk_size=512, chunk_overlap=50)
 
 def extract_date_from_filename(filename):
